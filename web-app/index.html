@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600" rel="stylesheet">
+	<link rel="stylesheet" href="css/reset.css"> 
+	<link rel="stylesheet" href="css/style.css"> <!-- Resource style -->
+    <script   src="https://code.jquery.com/jquery-3.3.1.min.js"   integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="   crossorigin="anonymous"></script>
+    <title>JMU Advisor Schedule Printer</title>
+</head>
+<body>
+
+<div class="canvas">
+    
+<div id="loadView" class="dialog">
+    <h1>Load CSV</h1>
+    <p>
+        <strong>Instructions: </strong> Log in to <a href="javascript:shell.openExternal('https://sa.jmu.edu');">https://sa.jmu.edu</a> and run the JCOMPSCI05 query using the Excel link. 
+        Download the Excel file for your query and open it in Excel. Then export it as a CSV file and use the buttons
+        below to load the exported CSV file.
+	</p>
+	<center>
+	<h2>Rules</h2>
+	<p>
+		These represent extra warnings you can have checked. Uncheck the box if you do not want to receive these warnings. 
+	</p>
+	<p><input id="csspecific" type="checkbox" checked/> CS Specific Warnings</p>	
+	</center>
+    <center>
+		<!--input type="button" onclick="loadCSV()" value="Load CSV File" /-->
+		JCOMPSCI05 CSV File: <input type="file" id="fileupload" onchange="loadFile(this.files[0])"  accept=".csv"/>
+    </center>
+</div>
+
+<div id="studentListView" class="dialog noprint_hidden">
+    <strong>Student: </strong>
+    <select id="students" style="font-size: 16pt;" onchange="showSchedule(this)">
+        <option value="">---Select a student---</option>
+	</select>
+	<ul id="studentList-warnings">
+
+	</ul>
+</div>
+
+<div id="scheduleView" class="schedule hidden">
+
+	<div id="summary"></div>
+
+	<svg viewBox="0 0 1300 800" id="schedule_template" width="100%" style="border: 1px solid black; background-color: white;">
+
+		<!--rect id="monday"
+			x="150" y="200" 
+			width="200" height="576"
+			style="stroke-width: 1px; stroke: rgb(200,200,200); fill: white;" />
+
+		<rect id="tuesday"
+			x="370" y="200" 
+			width="200" height="576"
+			style="stroke-width: 1px; stroke: rgb(200,200,200); fill: white;" />
+
+		<rect id="wednesday"
+			x="590" y="200" 
+			width="200" height="576"
+			style="stroke-width: 1px; stroke: rgb(200,200,200); fill: white;" />
+
+		<rect id="thursday"
+			x="810" y="200" 
+			width="200" height="576"
+			style="stroke-width: 1px; stroke: rgb(200,200,200); fill: white;" />
+
+		<rect id="friday"
+			x="1030" y="200" 
+			width="200" height="576"
+			style="stroke-width: 1px; stroke: rgb(200,200,200); fill: white;" /-->
+
+		
+		<line id="hourtick_7" x1="90" y1="200" x2="1230" y2="200" style="stroke:rgb(160, 160, 160);stroke-width:1"/>
+		<line id="hourtick_8" x1="90" y1="248" x2="1230" y2="248" style="stroke:rgb(160, 160, 160);stroke-width:1"/>
+		<line id="hourtick_9" x1="90" y1="296" x2="1230" y2="296" style="stroke:rgb(160, 160, 160);stroke-width:1"/>
+		<line id="hourtick_10" x1="90" y1="344" x2="1230" y2="344" style="stroke:rgb(160, 160, 160);stroke-width:1"/>
+		<line id="hourtick_11" x1="90" y1="392" x2="1230" y2="392" style="stroke:rgb(160, 160, 160);stroke-width:1"/>
+		<line id="hourtick_12" x1="90" y1="440" x2="1230" y2="440" style="stroke:rgb(160, 160, 160);stroke-width:1"/>
+		<line id="hourtick_13" x1="90" y1="488" x2="1230" y2="488" style="stroke:rgb(160, 160, 160);stroke-width:1"/>
+		<line id="hourtick_14" x1="90" y1="536" x2="1230" y2="536" style="stroke:rgb(160, 160, 160);stroke-width:1"/>
+		<line id="hourtick_15" x1="90" y1="584" x2="1230" y2="584" style="stroke:rgb(160, 160, 160);stroke-width:1"/>
+		<line id="hourtick_16" x1="90" y1="632" x2="1230" y2="632" style="stroke:rgb(160, 160, 160);stroke-width:1"/>
+		<line id="hourtick_17" x1="90" y1="680" x2="1230" y2="680" style="stroke:rgb(160, 160, 160);stroke-width:1"/>
+		<line id="hourtick_18" x1="90" y1="728" x2="1230" y2="728" style="stroke:rgb(160, 160, 160);stroke-width:1"/>
+		<line id="hourtick_19" x1="90" y1="776" x2="1230" y2="776" style="stroke:rgb(160, 160, 160);stroke-width:1"/>
+
+		<text x="30" y="205">08:00</text>
+		<text x="30" y="253">09:00</text>
+		<text x="30" y="301">10:00</text>
+		<text x="30" y="349">11:00</text>
+		<text x="30" y="397">12:00</text>
+		<text x="30" y="445">13:00</text>
+		<text x="30" y="493">14:00</text>
+		<text x="30" y="541">15:00</text>
+		<text x="30" y="589">16:00</text>
+		<text x="30" y="637">17:00</text>
+		<text x="30" y="685">18:00</text>
+		<text x="30" y="733">19:00</text>
+		<text x="30" y="781">20:00</text>
+
+		<text x="150" y="185" width="200">Monday</text>
+		<text x="370" y="185" width="200">Tuesday</text>
+		<text x="590" y="185" width="200">Wednesday</text>
+		<text x="810" y="185" width="200">Thursday</text>
+		<text x="1030" y="185" width="200">Friday</text>
+		
+	</svg>
+</div>
+
+</div> <!-- #canvas -->
+
+
+
+<script>
+
+
+	var cluster_one = new Set(["BUS160", "HIST150", "ISAT160", "SMAD150", "PHIL120", "PHIL150", "SCOM121", "SCOM122", "SCOM123", "WRTC103"]);
+
+	function clearCourses($svg) {
+		$svg.find(".course").remove();
+	}
+
+	function addScheduleItem($svg, courseName, courseDescription, courseLocation, days, startTime, endTime, color) {
+		var yval = function(time) { return 200 + 48 * (time-8); };
+		var xval = function(dayIdx) { return 150 + dayIdx*220; };
+
+		for (var i = 0; i < 5; i++) {
+			if (days[i] === "Y") {
+				var x = xval(i);
+				var y = yval(startTime);
+				var h = (yval(endTime) - yval(startTime));
+
+				if (courseLocation == "Online") {
+					y = 50;
+					h = 50;
+				}
+
+				$svg.append(
+					$("<svg class=\"course\" x=\"" +x + "\" y=\"" + y + "\" width=\"200\" height=\"" + h + "\"></svg>").append(
+						"<rect width=\"200\" height=\"200\" fill=\"" + color + "\"/>"
+					).append(
+						'<text x="10" y="18" style="font-size: 10pt; font-weight: 800">' + courseName + '</text>'
+					).append(
+						'<text x="10" y="32" style="font-size: 10pt">' + courseLocation + '</text>'
+					)
+				);
+			}
+		}
+
+
+		// For some reason you have to reload the svg's html from itself to get it to display (at least in Safari)
+		$svg.html(function() {return this.innerHTML });
+	}
+
+	//addScheduleItem($("svg#schedule_template"), "CS 101", "Program Funds", "ISAT/CS 101", ["Y","Y","N","N","Y"], 9, 12.5, "red");
+
+
+	if( !window.jQuery ) document.write('<script src="js/jquery-3.0.0.min.js"><\/script>');
+
+	function loadFile(file) {
+		if (!file) { alert("Failed to load file."); }
+		// else if (!file.type.match('.csv')) {
+		// 	alert(file.name + " is not a CSV file.");
+		// } 
+		else {
+			var reader = new FileReader();
+			reader.readAsText(file);
+			reader.onload = function () { loadCSV(reader.result); };
+		}
+	}
+
+
+	// $(document).ready(function() {
+	//     $.ajax({
+	//         type: "GET",
+	//         url: "JCOMPSCI05.csv",
+	//         dataType: "text",
+	//         success: function(data) {processData(data);}
+	//      });
+	// });
+
+	// This will parse a delimited string into an array of
+	// arrays. The default delimiter is the comma, but this
+	// can be overriden in the second argument.
+	function CSVToArray( strData, strDelimiter ){
+		// Check to see if the delimiter is defined. If not,
+		// then default to comma.
+		strDelimiter = (strDelimiter || ",");
+		// Create a regular expression to parse the CSV values.
+		var objPattern = new RegExp(
+			(
+				// Delimiters.
+				"(\\" + strDelimiter + "|\\r?\\n|\\r|^)" +
+				// Quoted fields.
+				"(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|" +
+				// Standard fields.
+				"([^\"\\" + strDelimiter + "\\r\\n]*))"
+			),
+			"gi"
+			);
+		// Create an array to hold our data. Give the array
+		// a default empty first row.
+		var arrData = [[]];
+		// Create an array to hold our individual pattern
+		// matching groups.
+		var arrMatches = null;
+		// Keep looping over the regular expression matches
+		// until we can no longer find a match.
+		while (arrMatches = objPattern.exec( strData )){
+			// Get the delimiter that was found.
+			var strMatchedDelimiter = arrMatches[ 1 ];
+			// Check to see if the given delimiter has a length
+			// (is not the start of string) and if it matches
+			// field delimiter. If id does not, then we know
+			// that this delimiter is a row delimiter.
+			if (
+				strMatchedDelimiter.length &&
+				(strMatchedDelimiter != strDelimiter)
+				){
+				// Since we have reached a new row of data,
+				// add an empty row to our data array.
+				arrData.push( [] );
+			}
+			// Now that we have our delimiter out of the way,
+			// let's check to see which kind of value we
+			// captured (quoted or unquoted).
+			if (arrMatches[ 2 ]){
+				// We found a quoted value. When we capture
+				// this value, unescape any double quotes.
+				var strMatchedValue = arrMatches[ 2 ].replace(
+					new RegExp( "\"\"", "g" ),
+					"\""
+					);
+			} else {
+				// We found a non-quoted value.
+				var strMatchedValue = arrMatches[ 3 ];
+			}
+			// Now that we have our value string, let's add
+			// it to the data array.
+			arrData[ arrData.length - 1 ].push( strMatchedValue );
+		}
+		// Return the parsed data.
+		return( arrData.filter(line => line.length > 3 && line[1] != undefined) );
+	}
+	var theStudentRecs;
+    function loadCSV(data) {
+
+		// Convert the CSV data to an array
+		var csvData = CSVToArray(data, ",");
+
+		var eids = [];
+		
+		// Grab the student records. 
+		var studentRecs = csvData.slice(1, csvData.length);
+		theStudentRecs = studentRecs;
+		// Add the unique eids in order
+		var lastEid = undefined;
+		studentRecs.forEach( function(line) {
+			var eid = line[1];
+			if (lastEid !== eid) {
+				eids.push(eid);
+				lastEid = eid;
+			}
+		});
+
+		// Create a dictionary of eid's to schedule lines:
+		var students = {};
+
+		studentRecs.forEach( function (line) {
+			var eid = line[1];
+			if (students[eid] === undefined) {
+				students[eid] = [];
+			}
+			for (var i = 0; i < line.length; i++) {
+				if (line[i] === undefined) line[i] = "";
+			}
+			students[eid].push(line);
+		});
+
+		$("select#students").find("option").remove().end().append('<option>---Select a student---</option>').val('');
+		eids.forEach(function (eid) {
+			$('<option value="' + eid + '">' + students[eid][0][2] + '</option>').appendTo($("select#students"));
+		});
+
+		$("#loadView").hide();
+		$("#studentListView").addClass("noprint_show").removeClass("noprint_hidden");
+
+		$("select#students").data("eids", eids);
+		$("select#students").data("schedules", students)
+		
+		// Load warnings
+
+		var students_without_schedules = [];
+		var students_with_cs149_and_math155 = [];
+		var students_with_no_cs_classes = [];
+		var students_with_fewer_than_four = [];
+
+		eids.forEach(function (eid) {
+			var schedule = students[eid];
+			var courses = new Set(schedule.map(course => course[3]));
+			if (schedule.length == 1 && schedule[0][3] == "") {
+				students_without_schedules.push(eid);
+			} else {
+				if (courses.size < 4) {
+					students_with_fewer_than_four.push(eid);
+				}
+				if (courses.has("CS149") && courses.has("MATH155")) students_with_cs149_and_math155.push(eid);
+				if (schedule.filter(course => course[3].startsWith("CS")).length == 0) students_with_no_cs_classes.push(eid);
+			}
+		})
+
+		function addWarningCategory(category, eids) {
+			var $li = $("<li>" + category + ": </li>");
+			var $ul = $("<ul></ul");
+				
+			eids.forEach(function (eid) {
+				var aCourse = students[eid][0];
+				var lastName = aCourse[2] == undefined ? "undefined" : aCourse[2].split(",")[0];
+				$ul.append($("<li><a href=\"javascript:showScheduleFor('" + eid + "')\">" + lastName + " (" + eid + ")</a></li>")).append(" ");
+			})
+			
+			$li.append($ul);
+			$("#studentList-warnings").append($li);
+		}
+
+		if (students_without_schedules.length > 0) addWarningCategory("No Schedule", students_without_schedules);
+		if (students_with_fewer_than_four.length > 0) addWarningCategory("Fewer than four courses", students_with_fewer_than_four);
+		if ($("#csspecific").is(":checked") && students_with_cs149_and_math155.length > 0) addWarningCategory("Taking both CS149 and MATH155", students_with_cs149_and_math155);
+		if ($("#csspecific").is(":checked") && students_with_no_cs_classes.length > 0) addWarningCategory("No CS Classes", students_with_no_cs_classes);
+		
+    }
+
+    function showSchedule(select) {
+		showScheduleFor($(select).val());
+	}
+	function showScheduleFor(eid) {
+        var $select = $("#students");
+
+        var schedule = $select.data("schedules")[eid];
+        
+        // alert(schedule);
+		// console.log(schedule);
+		
+		$("#summary").html("");
+
+		$("#scheduleView").show();
+
+		$("#summary").append(
+			$("<strong style=\"font-size: 14pt\">" + schedule[0][2].replace(",", ", ") + "</strong>")
+		).append(
+			$("<em style=\"margin-left:3em;\">(eid " + schedule[0][1] + ")</em>")
+		);
+
+		clearCourses($("svg#schedule_template"));
+		schedule.forEach(function (course) {
+			addScheduleItem($("svg#schedule_template"), course[3], course[5], course[13], course.slice(8,13), timeToDecimal(course[6]), timeToDecimal(course[7]), getColor(course[3]));
+		});
+
+		var $coursesUl = $("<ul></ul>");
+
+		var courses = new Set(schedule.map(course => course[3]));
+
+		courses.forEach(function (course) {
+			var entries = schedule.filter( c => c[3] == course )
+			$coursesUl.append("<li>" + course + ": " + entries[0][5] + "</li>");
+		})
+
+		$("#summary").append($("<br><br><p><strong>Schedule Overview</strong></p>"))
+		$("#summary").append($coursesUl);
+
+		var warnings = $('<ul id="warnings"></ul>');
+		
+		// Check that 
+		schedule.forEach(function (course1) {
+			schedule.forEach(function (course2) {
+				if (course1 != course2) {
+					var end_of_first = timeToDecimal(course1[7]);
+					var start_of_second = timeToDecimal(course2[6]);
+
+					if ((Math.abs(start_of_second - end_of_first) < 0.3) && !walkable(course1[13], course2[13]) && sameDay(course1, course2)) {
+						warnings.append(
+							$("<li>There is not enough time scheduled for the walk between " + course1[3] + " in " + course1[13] + " (" + areaForRoom(course1[13]) + " Area) and " + course2[3] + " in " + course2[13] + " (" + areaForRoom(course2[13]) + " Area).</li>")
+						)
+					}
+				}
+			})
+		});
+
+		// Check for other warnings.
+		var has_cs_course = false;
+		var has_cluster_one_course = false; 
+		var has_math_155 = false; 
+		var has_cs_149 = false; 
+		var has_cs_101 = false;
+		var has_no_schedule = false;
+
+		schedule.forEach(function (course) {
+			var courseNum = course[3];
+			if (courseNum.startsWith("CS")) has_cs_course = true;
+			if (courseNum == "MATH155") has_math_155 = true; 
+			if (courseNum == "CS149") has_cs_149 = true; 
+			if (courseNum == "CS101") has_cs_101 = true; 
+			if (courseNum == "") has_no_schedule = true; 
+			if (cluster_one.has(courseNum)) has_cluster_one_course = true;
+		});
+
+		if ($("#csspecific").is(":checked") && !has_cs_course) {
+			warnings.append($("<li>You have no CS courses!</li>"));
+		}
+
+		if (!has_cluster_one_course) {
+			warnings.append($("<li>You have no cluster one course.</li>"));
+		}
+
+		if ($("#csspecific").is(":checked") && has_math_155 && has_cs_149) {
+			warnings.append($("<li>You have both MATH 155 and CS 149, but they should not be taken together.</li>"));
+		}
+
+		if ($("#csspecific").is(":checked") && !has_cs_101) {
+			warnings.append($("<li>You need to enroll in CS 101!</li>"));
+		}
+
+		if (has_no_schedule) {
+			warnings.append($("<li>You have no schedule! Sign up for classes immediately!</li>"));
+		}
+
+		if (schedule.length < 4) {
+			warnings.append($("<li>This do not have a full schedule. You must have at least 12 hours of credit (4 courses).</li>"));
+		}
+
+		if (warnings.children().length > 0) {
+			$("#summary").append($("<p>&#160;</p><p><strong>Warnings: </strong></p>"))
+			$("#summary").append(warnings);
+		}
+	}
+	
+	function timeToDecimal(time) {
+		if (time == undefined) return 0;
+		var timeParts = time.split(".");
+		return Number(timeParts[0]) + (timeParts[1] / 60.0);
+	}
+
+
+	const WEST_BLUESTONE = "West Bluestone";
+	const BLUESTONE = "Bluestone";
+	const SOUTH_HIGH_GRACE = "South High St./Grace St.";
+	const CENTRAL = "Central Campus";
+	const NORTH = "North Campus";
+	const LOWER_SKYLINE = "Lower Skyline";
+	const UPPER_SKYLINE = "Upper Skyline";
+	const LAKESIDE = "Lakeside";
+
+
+	var buildings_to_areas = {
+		// West Bluestone
+		"Estes":WEST_BLUESTONE,
+		"Anthony-Seeger":WEST_BLUESTONE,
+		"Duke":WEST_BLUESTONE,
+		"Roberts":WEST_BLUESTONE,
+		"Music":WEST_BLUESTONE,
+		"Cleveland":WEST_BLUESTONE,
+
+		// Bluestone
+		"Wayland":BLUESTONE,
+		"Hoffman":BLUESTONE,
+		"Ashby":BLUESTONE,
+		"Johnston":BLUESTONE,
+		"Harrison":BLUESTONE,
+		"Jackson":BLUESTONE,
+		"Roop":BLUESTONE,
+		"Moody":BLUESTONE,
+		"Miller":BLUESTONE,
+		"Maury":BLUESTONE,
+		"Spotswood":BLUESTONE,
+		"Sheldon":BLUESTONE,
+		"Alumnae":BLUESTONE,
+		"Wilson":BLUESTONE,
+		"Burruss":BLUESTONE,
+		"Carrier":BLUESTONE,
+		"Keezell":BLUESTONE,
+
+		// South High St./Grace St.
+		"Grace":SOUTH_HIGH_GRACE,
+		"Studio":SOUTH_HIGH_GRACE,
+		"Memorial":SOUTH_HIGH_GRACE,
+
+		// Central Campus
+		"Grafton-Stovall":CENTRAL,
+		"D-Hall":CENTRAL,
+		
+		// North Campus
+		"Student":NORTH,
+		"Health":NORTH,
+
+		// Lower Skyline
+		"Biotechnology":LOWER_SKYLINE,
+		"ISAT/CS":LOWER_SKYLINE,
+		"Physics/Chemistry":LOWER_SKYLINE,
+		"Engineering/Geosciences":LOWER_SKYLINE,
+		"UREC":LOWER_SKYLINE,
+
+		// Upper Skyline
+		"Festival":UPPER_SKYLINE,
+		"Rose":UPPER_SKYLINE,
+		"E-Hall":UPPER_SKYLINE,
+
+		// Lakeside
+		"Godwin":LAKESIDE,
+		"Plecker":LAKESIDE,
+		"Showker":LAKESIDE,
+	};
+
+	var area_walk_graph = {};
+
+	area_walk_graph[WEST_BLUESTONE] = [WEST_BLUESTONE,BLUESTONE,NORTH,SOUTH_HIGH_GRACE];
+	area_walk_graph[BLUESTONE] = [BLUESTONE,WEST_BLUESTONE, SOUTH_HIGH_GRACE, NORTH, CENTRAL, LAKESIDE];
+	area_walk_graph[SOUTH_HIGH_GRACE] = [SOUTH_HIGH_GRACE,WEST_BLUESTONE,BLUESTONE,NORTH];
+	area_walk_graph[CENTRAL] = [CENTRAL,BLUESTONE,NORTH,LAKESIDE,LOWER_SKYLINE];
+	area_walk_graph[NORTH] = [NORTH,SOUTH_HIGH_GRACE,WEST_BLUESTONE,BLUESTONE,CENTRAL];
+	area_walk_graph[LOWER_SKYLINE] = [LOWER_SKYLINE,LAKESIDE,CENTRAL,UPPER_SKYLINE];
+	area_walk_graph[UPPER_SKYLINE] = [UPPER_SKYLINE,LOWER_SKYLINE];
+	area_walk_graph[LAKESIDE] = [LAKESIDE,BLUESTONE, CENTRAL, LOWER_SKYLINE];
+	
+	function areaForRoom(room) {
+		return buildings_to_areas[room.split(" ")[0]];
+	}
+
+	function walkable(room1, room2) {
+		return area_walk_graph[areaForRoom(room1)].indexOf(areaForRoom(room2)) >= 0;
+	}
+
+	function getColor(courseNumber) {
+		
+		if (cluster_one.has(courseNumber)) return "#88EEFF";
+		else if (courseNumber.startsWith("CS")) return "#88FFEE";
+		else if (courseNumber.startsWith("MATH")) return "#FF88EE";
+		return "#FFEE88";
+	}
+
+	function sameDay(course1, course2) {
+		return	(course1[8] == "Y" && course2[8] == "Y") ||
+				(course1[9] == "Y" && course2[9] == "Y") ||
+				(course1[10] == "Y" && course2[10] == "Y") ||
+				(course1[11] == "Y" && course2[11] == "Y") ||
+				(course1[12] == "Y" && course2[12] == "Y");
+	}
+
+
+</script>
+<!--script src="js/main.js"></script> <!-- Resource jQuery -->
+</body>
+</html>

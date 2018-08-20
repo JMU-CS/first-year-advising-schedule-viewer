@@ -4,8 +4,14 @@
   "description": "A viewer for viewing and printing advisee schedules for JMU queries.",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "electron ."
   },
   "author": "John C. Bowers",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^2.0.3"
+  },
+  "dependencies": {
+    "jquery": "^3.3.1"
+  }
 }
