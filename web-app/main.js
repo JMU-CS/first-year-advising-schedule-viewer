@@ -12,9 +12,14 @@ function clearCourses($svg) {
 }
 
 // Adds a course to the svg.
-function addScheduleItem($svg, courseName, courseDescription, courseLocation, days, startTime, endTime, color) {
+function addScheduleItem($svg, courseName, courseDescription, courseLocation, days, startTime, endTime, color, status) {
 	var yval = function(time) { return 200 + 48 * (time-8); };
 	var xval = function(dayIdx) { return 150 + dayIdx*220; };
+
+	if (status == "FULL") {
+		courseName = "Waiting: " + courseName;
+		color = "#D3D3D3";
+	}
 
 	for (var i = 0; i < 5; i++) {
 		if (days[i] === "Y") {
@@ -234,7 +239,7 @@ function showScheduleFor(eid) {
 
 	clearCourses($("svg#schedule_template"));
 	schedule.forEach(function (course) {
-		addScheduleItem($("svg#schedule_template"), course[3], course[5], course[13], course.slice(8,13), timeToDecimal(course[6]), timeToDecimal(course[7]), getColor(course[3]));
+		addScheduleItem($("svg#schedule_template"), course[3], course[5], course[13], course.slice(8,13), timeToDecimal(course[6]), timeToDecimal(course[7]), getColor(course[3]), course[15]);
 	});
 
 	var $coursesUl = $("<ul></ul>");
