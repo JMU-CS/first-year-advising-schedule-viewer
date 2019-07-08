@@ -282,6 +282,9 @@ function showScheduleFor(eid) {
 
 	schedule.forEach(function (course) {
 		var courseNum = course[3];
+		if (courseNum.endsWith("H")) {
+			courseNum = courseNum.substring(0, courseNum.length - 1);
+		}
 		if (courseNum.startsWith("CS")) has_cs_course = true;
 		if (courseNum == "MATH155") has_math_155 = true; 
 		if (courseNum == "CS149") has_cs_149 = true; 
@@ -311,7 +314,7 @@ function showScheduleFor(eid) {
 	}
 
 	if (schedule.length < 4) {
-		warnings.append($("<li>This do not have a full schedule. You must have at least 12 hours of credit (4 courses).</li>"));
+		warnings.append($("<li>You do not have a full schedule. You must have at least 12 hours of credit (4 courses).</li>"));
 	}
 
 	if (warnings.children().length > 0) {
