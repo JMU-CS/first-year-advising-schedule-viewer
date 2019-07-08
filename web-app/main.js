@@ -303,7 +303,7 @@ function showScheduleFor(eid) {
 	}
 
 	if ($("#csspecific").is(":checked") && !has_cs_101) {
-		warnings.append($("<li>You need to enroll in CS 101!</li>"));
+		warnings.append($("<li>You may want to consider enrolling in CS 101.</li>"));
 	}
 
 	if (has_no_schedule) {
