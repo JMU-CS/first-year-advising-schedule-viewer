@@ -133,44 +133,44 @@ function loadCSV(data) {
 	// Convert the CSV data to an array
 	var csvData = CSVToArray(data, ",");
 
-	var eids = [];
+	var sids = [];
 	
 	// Grab the student records. 
 	var studentRecs = csvData.slice(1, csvData.length);
 	theStudentRecs = studentRecs;
-	// Add the unique eids in order
-	var lastEid = undefined;
+	// Add the unique sids in order
+	var lastSid = undefined;
 	studentRecs.forEach( function(line) {
-		var eid = line[1];
-		if (lastEid !== eid) {
-			eids.push(eid);
-			lastEid = eid;
+		var sid = line[1];
+		if (lastSid !== sid) {
+			sids.push(sid);
+			lastSid = sid;
 		}
 	});
 
-	// Create a dictionary of eid's to schedule lines:
+	// Create a dictionary of sid's to schedule lines:
 	var students = {};
 
 	studentRecs.forEach( function (line) {
-		var eid = line[1];
-		if (students[eid] === undefined) {
-			students[eid] = [];
+		var sid = line[1];
+		if (students[sid] === undefined) {
+			students[sid] = [];
 		}
 		for (var i = 0; i < line.length; i++) {
 			if (line[i] === undefined) line[i] = "";
 		}
-		students[eid].push(line);
+		students[sid].push(line);
 	});
 
 	$("select#students").find("option").remove().end().append('<option>---Select a student---</option>').val('');
-	eids.forEach(function (eid) {
-		$('<option value="' + eid + '">' + students[eid][0][2] + '</option>').appendTo($("select#students"));
+	sids.forEach(function (sid) {
+		$('<option value="' + sid + '">' + students[sid][0][2] + '</option>').appendTo($("select#students"));
 	});
 
 	$("#loadView").hide();
 	$("#studentListView").addClass("noprint_show").removeClass("noprint_hidden");
 
-	$("select#students").data("eids", eids);
+	$("select#students").data("sids", sids);
 	$("select#students").data("schedules", students)
 	
 	// Load warnings
@@ -180,29 +180,29 @@ function loadCSV(data) {
 	var students_with_no_cs_classes = [];
 	var students_with_fewer_than_four = [];
 
-	eids.forEach(function (eid) {
-		var schedule = students[eid];
+	sids.forEach(function (sid) {
+		var schedule = students[sid];
 		var courses = new Set(schedule.map(course => course[3]));
 		if (schedule.length == 1 && schedule[0][3] == "") {
-			students_without_schedules.push(eid);
+			students_without_schedules.push(sid);
 		} else {
 			if (courses.size < 4) {
-				students_with_fewer_than_four.push(eid);
+				students_with_fewer_than_four.push(sid);
 			}
-			if (courses.has("CS149") && courses.has("MATH155")) students_with_cs149_and_math155.push(eid);
-			if (schedule.filter(course => course[3].startsWith("CS")).length == 0) students_with_no_cs_classes.push(eid);
+			if (courses.has("CS149") && courses.has("MATH155")) students_with_cs149_and_math155.push(sid);
+			if (schedule.filter(course => course[3].startsWith("CS")).length == 0) students_with_no_cs_classes.push(sid);
 		}
 	})
 
 	// Nested function for adding a warning category to the list of warnings. 
-	function addWarningCategory(category, eids) {
+	function addWarningCategory(category, sids) {
 		var $li = $("<li>" + category + ": </li>");
 		var $ul = $("<ul></ul");
 			
-		eids.forEach(function (eid) {
-			var aCourse = students[eid][0];
+		sids.forEach(function (sid) {
+			var aCourse = students[sid][0];
 			var lastName = aCourse[2] == undefined ? "undefined" : aCourse[2].split(",")[0];
-			$ul.append($("<li><a href=\"javascript:showScheduleFor('" + eid + "')\">" + lastName + " (" + eid + ")</a></li>")).append(" ");
+			$ul.append($("<li><a href=\"javascript:showScheduleFor('" + sid + "')\">" + lastName + " (" + sid + ")</a></li>")).append(" ");
 		})
 		
 		$li.append($ul);
@@ -221,11 +221,11 @@ function showSchedule(select) {
 	showScheduleFor($(select).val());
 }
 
-// Shows the schedule for the student with the given eid. 
-function showScheduleFor(eid) {
+// Shows the schedule for the student with the given sid. 
+function showScheduleFor(sid) {
 	var $select = $("#students");
 
-	var schedule = $select.data("schedules")[eid];
+	var schedule = $select.data("schedules")[sid];
 	
 	$("#summary").html("");
 
@@ -234,7 +234,7 @@ function showScheduleFor(eid) {
 	$("#summary").append(
 		$("<strong style=\"font-size: 14pt\">" + schedule[0][2].replace(",", ", ") + "</strong>")
 	).append(
-		$("<em style=\"margin-left:3em;\">(eid " + schedule[0][1] + ")</em>")
+		$("<em style=\"margin-left:3em;\">(sid " + schedule[0][1] + ")</em>")
 	);
 
 	clearCourses($("svg#schedule_template"));
