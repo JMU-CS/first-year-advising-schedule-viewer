@@ -305,9 +305,9 @@ function showScheduleFor(sid) {
 		warnings.append($("<li>You have both MATH 155 and CS 149, but they should not be taken together.</li>"));
 	}
 
-	if ($("#csspecific").is(":checked") && !has_cs_101) {
-		warnings.append($("<li>You may want to consider enrolling in CS 101.</li>"));
-	}
+	// if ($("#csspecific").is(":checked") && !has_cs_101) {
+	// 	warnings.append($("<li>You may want to consider enrolling in CS 101.</li>"));
+	// }
 
 	if (has_no_schedule) {
 		warnings.append($("<li>You have no schedule! Sign up for classes immediately!</li>"));

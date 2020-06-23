@@ -72,5 +72,6 @@ function areaForRoom(room) {
     return buildings_to_areas[room.split(" ")[0]];
 }
 function walkable(room1, room2) {
-    return area_walk_graph[areaForRoom(room1)].indexOf(areaForRoom(room2)) >= 0;
+    return room1 === "Online" || room2 === "Online" ||
+           area_walk_graph[areaForRoom(room1)].indexOf(areaForRoom(room2)) >= 0;
 }
