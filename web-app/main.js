@@ -180,6 +180,10 @@ function loadCSV(data) {
 	var students_with_no_cs_classes = [];
 	var students_with_fewer_than_four = [];
 
+	var count_students_with_cs149 = 0;
+	var count_students_with_math155 = 0;
+	var count_students_with_cs159 = 0;
+
 	sids.forEach(function (sid) {
 		var schedule = students[sid];
 		var courses = new Set(schedule.map(course => course[3]));
@@ -190,7 +194,10 @@ function loadCSV(data) {
 				students_with_fewer_than_four.push(sid);
 			}
 			if (courses.has("CS149") && courses.has("MATH155")) students_with_cs149_and_math155.push(sid);
-			if (schedule.filter(course => course[3].startsWith("CS")).length == 0) students_with_no_cs_classes.push(sid);
+			if (schedule.filter(course => course[3].startsWith("CS") || course[3] == "MATH155").length == 0) students_with_no_cs_classes.push(sid);
+			if (courses.has("CS149")) count_students_with_cs149++;
+			if (courses.has("MATH155")) count_students_with_math155++;
+			if (courses.has("CS159")) count_students_with_cs159++;
 		}
 	})
 
@@ -213,6 +220,13 @@ function loadCSV(data) {
 	if (students_with_fewer_than_four.length > 0) addWarningCategory("Fewer than four courses", students_with_fewer_than_four);
 	if ($("#csspecific").is(":checked") && students_with_cs149_and_math155.length > 0) addWarningCategory("Taking both CS149 and MATH155", students_with_cs149_and_math155);
 	if ($("#csspecific").is(":checked") && students_with_no_cs_classes.length > 0) addWarningCategory("No CS Classes", students_with_no_cs_classes);
+	if ($("#csspecific").is(":checked")) {
+		$("#studentList-warnings").append($("<li>Number of students taking CS159: " + count_students_with_cs159 + "</li>"));
+		$("#studentList-warnings").append($("<li>Number of students taking CS149: " + count_students_with_cs149 + "</li>"));
+		$("#studentList-warnings").append($("<li>Number of students taking MATH155: " + count_students_with_math155 + "</li>"));
+		// print total number of students
+		$("#studentList-warnings").append($("<li>Number of students: " + sids.length + "</li>").css("font-weight", "bold"));
+	}
 }
 
 // Shows the schedule for the student given by the currently selected item
@@ -285,7 +299,7 @@ function showScheduleFor(sid) {
 		if (courseNum.endsWith("H")) {
 			courseNum = courseNum.substring(0, courseNum.length - 1);
 		}
-		if (courseNum.startsWith("CS")) has_cs_course = true;
+		if (courseNum.startsWith("CS") || courseNum == "MATH155") has_cs_course = true;
 		if (courseNum == "MATH155") has_math_155 = true; 
 		if (courseNum == "CS149") has_cs_149 = true; 
 		if (courseNum == "CS101") has_cs_101 = true; 
@@ -298,12 +312,12 @@ function showScheduleFor(sid) {
 	}
 
 	if (!has_cluster_one_course) {
-		warnings.append($("<li>You have no cluster one course.</li>"));
+		warnings.append($("<li>You have no Madison Foundation course.</li>"));
 	}
 
-	if ($("#csspecific").is(":checked") && has_math_155 && has_cs_149) {
-		warnings.append($("<li>You have both MATH 155 and CS 149, but they should not be taken together.</li>"));
-	}
+	// if ($("#csspecific").is(":checked") && has_math_155 && has_cs_149) {
+	// 	warnings.append($("<li>You have both MATH 155 and CS 149, but they should not be taken together.</li>"));
+	// }
 
 	// if ($("#csspecific").is(":checked") && !has_cs_101) {
 	// 	warnings.append($("<li>You may want to consider enrolling in CS 101.</li>"));
@@ -334,7 +348,7 @@ function timeToDecimal(time) {
 function getColor(courseNumber) {
 	
 	if (CLUSTER_ONE.has(courseNumber)) return "#88EEFF";
-	else if (courseNumber.startsWith("CS")) return "#88FFEE";
+	else if (courseNumber.startsWith("CS") || courseNumber == "MATH155") return "#88FFEE";
 	else if (courseNumber.startsWith("MATH")) return "#FF88EE";
 	return "#FFEE88";
 }
